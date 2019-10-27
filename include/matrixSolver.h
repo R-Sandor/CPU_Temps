@@ -43,4 +43,9 @@ void eliminate(std::vector<std::vector<double> > &matrix, int loopIter);
 
 void backSolve(std::vector<std::vector<double> > &matrix);
 
+/*
+ *	@param takes vector as input to create the X matrix
+ */
+std::vector<std::vector<double> > createXMatrix(std::vector<double> &timeVect);
+
 #endif

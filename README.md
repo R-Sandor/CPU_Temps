@@ -1,5 +1,5 @@
 # CPU Temps
-> This program will takes the readings from N (in our case 4) cores 
+This program will takes the readings from N (in our case 4) cores 
 in a CPU. Each reading was taken in 30 second internvals.
 
 The program takes the reading from the input files of each core and 
@@ -29,8 +29,8 @@ Provided core readings courtesy of Professor Thomas J Kennedy at ODU.
 
 
 # Setup/Compilation & Execution Instructions  
--Untar package.
--make
+- Untar package.
+- make
 
 ### To Run
 > ./ res/matrix.txt

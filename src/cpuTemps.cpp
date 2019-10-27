@@ -18,6 +18,12 @@
 
 using namespace std;
 
+
+/**
+ *	@param lhs left-hand side 
+ *	@param rhs right-hand side
+ *
+ */
 vector<vector<double>>  multiplyer(vector<vector<double>> lhs, vector<vector<double>> rhs)
 {
 	int lhsRows = lhs.size();
@@ -44,6 +50,20 @@ void swapRow(vector<vector<double> > &matrix, int loopIter, int lrgstCol)
 	swap(matrix[loopIter], matrix[lrgstCol]);
 }
 
+
+vector<vector<double>> createXMatrix(vector<double> &timeVector)
+{
+	vector<vector <double> > xMatrix;
+	vector<double> onesVect;
+
+	for (int i = 0; i < timeVector.size(); i++)
+	{
+		onesVect.push_back(1);
+	}
+	xMatrix.push_back(onesVect);
+	xMatrix.push_back(timeVector);
+	return xMatrix; 
+}
 
 /*
  *	Finds the row which the largest column belongs.
@@ -109,70 +129,100 @@ void backSolve(vector<vector<double> >&matrix)
 	}
 }
 
-
+/**
+ *	@param argv takes file path
+ *
+ */
 int main(int argc, char **argv )
 {
 	if (argv[1] == NULL)
 	{
-		cout << "Error: Please provide path to the matrix file. Refer to the README.md" << endl;
+		cout << "Error: Please provide path to the data file. Refer to the README.md" << endl;
 		return 1;
 	}
 	if (argc == 1)
 	{	
-		cout << "Please run program again with in file path to matrix input file" << endl;
+		cout << "Please run program again with file path to data file" << endl;
 		return 1;
 	}
-	vector<vector<double> > matrixA { {1,2,3},
-									  {4,5,6}
-									};
-	vector<vector<double> > matrixB {
-									  {1,2,3},
-									  {4,5,6},
-									  {7,8,9}
-									};
 
-	//The read in matrix
-	vector<vector<double>> matrix;
-	string line;
-	// used for vector parser helper functions
-	string delim = " ";
 	//	readFile
-	ifstream matrixFile;
+	ifstream dataFile;
 	// path to file
 	string path = argv[1];
+	
+	string line;
+	string delim = " "; 
+
+	// Number of cores to be reading data from.
+	int cores;
+	vector< vector<double> > data;	
+
 
 	// Check if the path is correct.	
-	matrixFile.open(path);
-	if (!matrixFile)
+	dataFile.open(path);
+	if (!dataFile)
 	{
 		cout << "Error: File not found, check file path"<< endl;
 		return 1;
 	}
-	if (matrixFile.is_open())
-			while (getline(matrixFile, line) )
+	if (dataFile.is_open())
+		getline(dataFile, line);
+		vector<double> inputLine = stringToVector(line, delim);
+		// If there are four cores, we want to register it as 5
+		// 1 for the time of recording.
+		cores = inputLine.size() + 1;
+
+		// element 0 for the time vector
+		// e.g. 30, 60, 90, 120	
+		for (int indexOfCore = 0; indexOfCore < cores; indexOfCore++)
+		{
+			vector<double> core;
+			if (indexOfCore == 0)
+				core.push_back(0);
+			else
+				core.push_back(inputLine[indexOfCore]);
+			// push each core into its own vector	
+			data.push_back(core);
+		}
+
+		int count = 0; 
+		while (getline(dataFile, line) )
+		{
+			// Now we want to take the output of each row and add it to its respective vector
+			inputLine = stringToVector(line, delim);
+			for (int indexOfCore = 0; indexOfCore < cores ; indexOfCore++)
 			{
-				vector<double> inputLine = stringToVector(line, delim);
-				matrix.push_back(inputLine);
+				if (indexOfCore == 0)
+				{
+					data[indexOfCore].push_back(count * 30);
+					count++;						
+					continue;
+				}	
+				else
+					data[indexOfCore].push_back(inputLine[indexOfCore-1]);
 			}
+		}
 
-	for (int i = 0; i < matrix.size()-1; i++)
-	{
-		int lrgstRow = findLargestCol(matrix, i);
+		// Print my input data file..
+		for (int i = 0; i < data[1].size(); i++)
+		{
+			for (int j = 0; j < cores; j++)
+			{
+				cout << data[j][i] << " ";
+			}
+			cout << endl;
+		}
 		
-		// swap the rows.
-		swapRow(matrix, i, lrgstRow);
+		vector<vector<double> > xMatrix;
+		xMatrix = createXMatrix(data[0]);
+		for (int i = 0; i < xMatrix[0].size(); i++)
+		{
+			for (int j = 0; j < cores; j++)
+			{
+				cout << data[j][i] << " ";
+			}
+			cout << endl;
+		}
 		
-		// scale the row.
-		scale(matrix, i, matrix[i][i]);
-		matrix[i][i] = 1;
-		eliminate(matrix, i);
-	}
-	double scalar = 0.0;
-	// Lastrow needs to be solved.
-	scalar = 1/matrix[matrix.size()-1][matrix[0].size()-2];
-	matrix[matrix.size()-1][matrix[0].size()-2] = 1;
-	matrix[matrix.size()-1][matrix[0].size()-1] = matrix[matrix.size()-1][matrix[0].size()-1]*scalar;
-	backSolve(matrix);
-	printMatrix(matrix);
-
 }
