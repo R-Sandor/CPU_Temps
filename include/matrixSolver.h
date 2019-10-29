@@ -11,9 +11,14 @@
  *	not do matrix multiplication.
  *
  *	Returns the resulting matrix.
+ *
+ *	@param lhs 
+ *	@param rhs
+ *
  */
-std::vector<std::vector<double>>  multiplyer(std::vector< std::vector<double> >lhs, 
-				std::vector< std::vector<double>> rhs);
+void  multiplyer(std::vector< std::vector<double> >lhs, 
+				std::vector< std::vector<double>> rhs,
+				std::vector< std::vector<double>> &result);
 
 
 /*
@@ -47,5 +52,10 @@ void backSolve(std::vector<std::vector<double> > &matrix);
  *	@param takes vector as input to create the X matrix
  */
 std::vector<std::vector<double> > createXMatrix(std::vector<double> &timeVect);
+
+/*
+ *	@param matrix takes a matrix and returns the transpose of matrix. 
+ */
+std::vector<std::vector<double> > createTMatrix(std::vector <std::vector<double> > &matrix);
 
 #endif

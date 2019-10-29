@@ -15,14 +15,14 @@ Provided core readings courtesy of Professor Thomas J Kennedy at ODU.
 
 
 # Project Layout
-## Build
+## build
 > compiled src code excluding the program executable
 
 ## Include
 > .h files
 
 ## res
-> Resource files, matrices to solve
+> Resource files, CPU temparature readings.
 
 ## src
 > Source code

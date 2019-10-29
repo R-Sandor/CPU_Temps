@@ -1,7 +1,7 @@
-/*
- * Author:	Raphael J. Sandor
- * Date:	10/26/2019
- * Version: 1.0
+/**
+ * @Author:	Raphael J. Sandor
+ * @Date:	10/26/2019
+ * @Version: 1.0
  * 
  * Description: 
  *		This program reads in a file of CPU core tempatures and find the line of best fit
@@ -20,29 +20,41 @@ using namespace std;
 
 
 /**
- *	@param lhs left-hand side 
- *	@param rhs right-hand side
+ *	@param lhs left-hand side matrix
+ *	@param rhs right-hand side matrix 
+ *
+ *	Assumption: Matrix need to be correct demensions have a valid result. 
+ *	2X3 Matrix needs to be multiplied against a 3X2 matrix.
  *
  */
-vector<vector<double>>  multiplyer(vector<vector<double>> lhs, vector<vector<double>> rhs)
+void  multiplyer(vector<vector<double>> lhs, vector<vector<double>> rhs, vector<vector<double> >& result)
 {
 	int lhsRows = lhs.size();
 	int lhsCols = lhs[0].size();
-	vector<vector<double> > result(lhs.size());
-    			
+	int rhsRows = rhs.size();
+	int rhsCols = rhs[0].size();
+    
+	cout << "lhsRow: " <<  lhsRows << endl << "lhsCols: " << lhsCols << endl << "rhsRows: " << rhsRows << endl << "rhsCols: "  << rhsCols << endl << endl;
 	for (int i = 0; i < lhsRows; i++)
 	{	
-		result[i] = vector<double>(rhs.size());
-		for (int j = 0; j < lhsCols; j++)
+		vector<double> row (rhsCols);
+		result.push_back(row);
+		for (int j = 0; j < rhsCols; j++)
+		{
 			for (int k = 0; k < lhsCols; k++)
+			{
 				result[i][j] += lhs[i][k] * rhs[k][j];
+			}
+		}
 	}
-	return result;
 
 }	
 
-/*
- *	Swap vector indices.
+/**
+ *	@param matrix		The original matrix
+ *	@param lrgstCol		The row (i.e. vector) with the largest column
+ *	@loopIter			The iteration of the calling loop.
+ *	Swaps vector indices.
  */
 void swapRow(vector<vector<double> > &matrix, int loopIter, int lrgstCol)
 {
@@ -53,7 +65,7 @@ void swapRow(vector<vector<double> > &matrix, int loopIter, int lrgstCol)
 
 vector<vector<double>> createXMatrix(vector<double> &timeVector)
 {
-	vector<vector <double> > xMatrix;
+	vector<vector<double> > xMatrix;
 	vector<double> onesVect;
 
 	for (int i = 0; i < timeVector.size(); i++)
@@ -64,6 +76,26 @@ vector<vector<double>> createXMatrix(vector<double> &timeVector)
 	xMatrix.push_back(timeVector);
 	return xMatrix; 
 }
+
+vector<vector<double> > createTMatrix(vector<vector<double> > &inMatrix)
+{
+	vector<vector <double> >tMatrix (inMatrix[0].size());
+	int inMatCols = inMatrix[0].size();
+	for (int i = 0; i < inMatrix.size(); i++)
+			for (int j = 0; j < inMatCols ; j++)
+			{
+				if (i == 0)
+				{
+					vector<double> row (inMatrix.size()); 
+					row[0] = inMatrix[0][j];
+					tMatrix[j] = row;
+				}	
+					tMatrix[j][i] = inMatrix[i][j];
+				
+			}
+	return tMatrix;
+}
+
 
 /*
  *	Finds the row which the largest column belongs.
@@ -84,7 +116,7 @@ int findLargestCol(vector<vector<double> > &matrix, int col)
 	return largest;
 }
 
-/*
+/**
  *	Takes a matrix, and for each row (i.e. iteration of the calling loop).
  *	Scalar used to scale the matrix.
  */
@@ -114,6 +146,21 @@ void eliminate(vector<vector<double> > &matrix, int rowIt)
 
 }
 
+/**
+ * @param matrix The matrix that will be backed solved.
+ *
+ * At this point the matrix has been established into the well known
+ * diagnol matrix.
+ * 1 # # | # \n
+ * 0 1 # | # \n
+ * 0 0 1 | # \n
+ * 
+ * and the remaining #'s in the A matrix need to be 
+ * replaced with 0 and the c vector need to reflect the appropriate
+ * values. 
+ *
+ */
+
 void backSolve(vector<vector<double> >&matrix)
 {
 	int augCol	= matrix[0].size()-1;
@@ -130,8 +177,8 @@ void backSolve(vector<vector<double> >&matrix)
 }
 
 /**
- *	@param argv takes file path
- *
+ *	@param argc Argument count
+ *	@param argv Takes file path
  */
 int main(int argc, char **argv )
 {
@@ -181,12 +228,12 @@ int main(int argc, char **argv )
 			if (indexOfCore == 0)
 				core.push_back(0);
 			else
-				core.push_back(inputLine[indexOfCore]);
+				core.push_back(inputLine[indexOfCore-1]);
 			// push each core into its own vector	
 			data.push_back(core);
 		}
 
-		int count = 0; 
+		int count = 1; 
 		while (getline(dataFile, line) )
 		{
 			// Now we want to take the output of each row and add it to its respective vector
@@ -196,14 +243,15 @@ int main(int argc, char **argv )
 				if (indexOfCore == 0)
 				{
 					data[indexOfCore].push_back(count * 30);
-					count++;						
 					continue;
 				}	
 				else
 					data[indexOfCore].push_back(inputLine[indexOfCore-1]);
+				count++;						
 			}
 		}
-
+		
+/*		
 		// Print my input data file..
 		for (int i = 0; i < data[1].size(); i++)
 		{
@@ -213,16 +261,63 @@ int main(int argc, char **argv )
 			}
 			cout << endl;
 		}
-		
+*/	
 		vector<vector<double> > xMatrix;
+		vector<vector<double> > xTMatrix;
 		xMatrix = createXMatrix(data[0]);
+/*
 		for (int i = 0; i < xMatrix[0].size(); i++)
 		{
-			for (int j = 0; j < cores; j++)
+			for (int j = 0; j < xMatrix.size(); j++)
 			{
-				cout << data[j][i] << " ";
+				cout << xMatrix[j][i] << " ";
 			}
 			cout << endl;
 		}
+*/
+
+
+
+
+
+		xTMatrix = createTMatrix(xMatrix);
 		
+		// Print my input data file..
+		for (int i = 0; i < xTMatrix[0].size(); i++)
+		{
+			for (int j = 0; j < xTMatrix.size(); j++)
+			{
+				cout << xTMatrix[j][i] << " ";
+			}
+			cout << endl << endl;
+		}
+		vector<vector<double> > xTxMatrix;
+		
+		multiplyer(xMatrix, xTMatrix, xTxMatrix);
+		cout << xTxMatrix.size() << endl;	
+
+		cout << xTxMatrix[0].size() << endl;
+
+
+
+    vector<vector<double> > matrixA { {1,1,1},
+                                      {0,30,60}
+                                    };
+    vector<vector<double> > matrixB {
+                                      {1,2,3, 4},
+                                      {4,5,6, 7},
+                                      {7,8,9, 10},
+									  {11,12,13,14}
+									  
+                                    };
+	vector<vector<double> >matrix2;
+
+	vector<vector<double> >matrix3;
+	matrix2 = createTMatrix(matrixA);
+	printMatrix(matrix2);
+	printMatrix(matrixA);
+	multiplyer(matrixA, matrix2, matrix3);
+
+//	printMatrix(xTxMatrix);
+	printMatrix(matrix3);
 }
