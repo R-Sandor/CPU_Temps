@@ -28,7 +28,7 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 clean:
 	$(RM) -r $(BUILD_DIR)
 	$(RM) -r $(TARGET_EXEC)
-
+	$(RM) -f res/*"-core-"*
 -include $(DEPS)
 
 MKDIR_P ?= mkdir -p

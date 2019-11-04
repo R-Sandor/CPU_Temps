@@ -15,6 +15,7 @@
 
 #include "matrixSolver.h"
 #include "helper.h"
+#include "interpolation.h"
 
 using namespace std;
 
@@ -33,8 +34,7 @@ void  multiplyer(vector<vector<double>> lhs, vector<vector<double>> rhs, vector<
 	int lhsCols = lhs[0].size();
 	int rhsRows = rhs.size();
 	int rhsCols = rhs[0].size();
-    
-	cout << "lhsRow: " <<  lhsRows << endl << "lhsCols: " << lhsCols << endl << "rhsRows: " << rhsRows << endl << "rhsCols: "  << rhsCols << endl << endl;
+   
 	for (int i = 0; i < lhsRows; i++)
 	{	
 		vector<double> row (rhsCols);
@@ -43,12 +43,36 @@ void  multiplyer(vector<vector<double>> lhs, vector<vector<double>> rhs, vector<
 		{
 			for (int k = 0; k < lhsCols; k++)
 			{
+				
 				result[i][j] += lhs[i][k] * rhs[k][j];
 			}
 		}
 	}
 
 }	
+
+void  multiplyVectByMat(vector<vector<double>> lhs, vector<double> rhs, vector<vector<double> >& result)
+{
+	int lhsRows = lhs.size();
+	int lhsCols = lhs[0].size();
+	int rhsRows = rhs.size();
+	int rhsCols = 1;
+   
+	for (int i = 0; i < lhsRows; i++)
+	{	
+		vector<double> row (rhsCols);
+		result.push_back(row);
+		for (int j = 0; j < rhsCols; j++)
+		{
+			for (int k = 0; k < lhsCols; k++)
+			{
+				
+				result[i][j] += lhs[i][k] * rhs[k];
+			}
+		}
+	}
+
+}
 
 /**
  *	@param matrix		The original matrix
@@ -63,17 +87,14 @@ void swapRow(vector<vector<double> > &matrix, int loopIter, int lrgstCol)
 }
 
 
-vector<vector<double>> createXMatrix(vector<double> &timeVector)
+vector<vector<double>> createXMatrix(vector<double> &dataVect)
 {
 	vector<vector<double> > xMatrix;
 	vector<double> onesVect;
-
-	for (int i = 0; i < timeVector.size(); i++)
+	for (int i = 0; i < dataVect.size(); i++)
 	{
-		onesVect.push_back(1);
+		xMatrix.push_back({1, dataVect[i]});
 	}
-	xMatrix.push_back(onesVect);
-	xMatrix.push_back(timeVector);
 	return xMatrix; 
 }
 
@@ -90,6 +111,7 @@ vector<vector<double> > createTMatrix(vector<vector<double> > &inMatrix)
 					row[0] = inMatrix[0][j];
 					tMatrix[j] = row;
 				}	
+				else
 					tMatrix[j][i] = inMatrix[i][j];
 				
 			}
@@ -214,8 +236,10 @@ int main(int argc, char **argv )
 		return 1;
 	}
 	if (dataFile.is_open())
+
 		getline(dataFile, line);
 		vector<double> inputLine = stringToVector(line, delim);
+
 		// If there are four cores, we want to register it as 5
 		// 1 for the time of recording.
 		cores = inputLine.size() + 1;
@@ -225,17 +249,21 @@ int main(int argc, char **argv )
 		for (int indexOfCore = 0; indexOfCore < cores; indexOfCore++)
 		{
 			vector<double> core;
+
 			if (indexOfCore == 0)
 				core.push_back(0);
 			else
 				core.push_back(inputLine[indexOfCore-1]);
+
 			// push each core into its own vector	
 			data.push_back(core);
 		}
-
+		
+		// count used as index to multiply 30 against for each reading.
 		int count = 1; 
 		while (getline(dataFile, line) )
 		{
+
 			// Now we want to take the output of each row and add it to its respective vector
 			inputLine = stringToVector(line, delim);
 			for (int indexOfCore = 0; indexOfCore < cores ; indexOfCore++)
@@ -243,81 +271,95 @@ int main(int argc, char **argv )
 				if (indexOfCore == 0)
 				{
 					data[indexOfCore].push_back(count * 30);
+					count++;						
 					continue;
 				}	
 				else
 					data[indexOfCore].push_back(inputLine[indexOfCore-1]);
-				count++;						
 			}
 		}
 		
-/*		
-		// Print my input data file..
-		for (int i = 0; i < data[1].size(); i++)
-		{
-			for (int j = 0; j < cores; j++)
-			{
-				cout << data[j][i] << " ";
-			}
-			cout << endl;
-		}
-*/	
+		
+
+		// xMatrix
 		vector<vector<double> > xMatrix;
+
+		// x transpose matrix.
 		vector<vector<double> > xTMatrix;
+
+		// create the x matrix from the time column in the data vector.
 		xMatrix = createXMatrix(data[0]);
-/*
-		for (int i = 0; i < xMatrix[0].size(); i++)
+
+		// iterates through all of the data columns to ouput to a text file.
+		for (int outIndex = 1; outIndex < cores; outIndex++)
 		{
-			for (int j = 0; j < xMatrix.size(); j++)
-			{
-				cout << xMatrix[j][i] << " ";
-			}
-			cout << endl;
-		}
-*/
-
-
-
-
-
-		xTMatrix = createTMatrix(xMatrix);
+			ofstream outputFile;
+			
+			int pos =  path.find(".txt");
+			string baseName = path.substr(0, pos);
+			baseName = baseName + "-core-"+to_string(outIndex-1)+".txt";
+			outputFile.open(baseName);
+			
 		
-		// Print my input data file..
-		for (int i = 0; i < xTMatrix[0].size(); i++)
-		{
-			for (int j = 0; j < xTMatrix.size(); j++)
+			xTMatrix = createTMatrix(xMatrix);
+	
+			// x Transpose x and x Transpose y matrix	
+			vector<vector<double> > xTx_xTyMatrix;
+			
+			// y Matrix
+			vector<double> yMatrix = data[outIndex];
+			
+			// x Transpose y matrix
+			vector<vector<double> > xTyMatrix;
+			// Create the A matrix
+			multiplyer(xTMatrix, xMatrix, xTx_xTyMatrix);
+			// c Vector
+			multiplyVectByMat(xTMatrix, yMatrix, xTyMatrix);
+
+
+
+
+			// Add the c vector to the A matrix
+			for (int addYIndx = 0; addYIndx < xTx_xTyMatrix.size(); addYIndx++)
 			{
-				cout << xTMatrix[j][i] << " ";
+				xTx_xTyMatrix[addYIndx].push_back(xTyMatrix[addYIndx][0]);
 			}
-			cout << endl << endl;
+			
+			// Solve
+			for (int i = 0; i < xTx_xTyMatrix.size()-1; i++)
+			{
+				int lrgstRow = findLargestCol(xTx_xTyMatrix, i);
+
+				// swap the rows.
+				swapRow(xTx_xTyMatrix, i, lrgstRow);
+
+				// scale the row.
+				scale(xTx_xTyMatrix, i, xTx_xTyMatrix[i][i]);
+				xTx_xTyMatrix[i][i] = 1;
+				eliminate(xTx_xTyMatrix, i);
+			}
+				double scalar = 0.0;
+				// Last row needs to be solved.
+				scalar = 1/xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-2];
+				xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-2] = 1;
+				xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-1] 
+						= xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-1] * scalar;
+				backSolve(xTx_xTyMatrix);
+				
+				double c0 = xTx_xTyMatrix[0][2];
+				double c1 = xTx_xTyMatrix[1][2];
+				// TODO: Break this into it's own function
+				// -------------------------------------------------------------------
+				// Write all of the points to 
+				for (int write_index = 0; write_index < count; write_index++)
+				{
+					outputFile << "0 <= " <<  write_index * 30 <<  "< " << count*30 <<  "; " << "y" << write_index << "= " 
+							<< c0 + c1*30*write_index << "; Least Squares";
+					outputFile << endl;
+				}
+				outputFile.close();
+
+
+				// TODO: Call interpolation function
 		}
-		vector<vector<double> > xTxMatrix;
-		
-		multiplyer(xMatrix, xTMatrix, xTxMatrix);
-		cout << xTxMatrix.size() << endl;	
-
-		cout << xTxMatrix[0].size() << endl;
-
-
-
-    vector<vector<double> > matrixA { {1,1,1},
-                                      {0,30,60}
-                                    };
-    vector<vector<double> > matrixB {
-                                      {1,2,3, 4},
-                                      {4,5,6, 7},
-                                      {7,8,9, 10},
-									  {11,12,13,14}
-									  
-                                    };
-	vector<vector<double> >matrix2;
-
-	vector<vector<double> >matrix3;
-	matrix2 = createTMatrix(matrixA);
-	printMatrix(matrix2);
-	printMatrix(matrixA);
-	multiplyer(matrixA, matrix2, matrix3);
-
-//	printMatrix(xTxMatrix);
-	printMatrix(matrix3);
 }

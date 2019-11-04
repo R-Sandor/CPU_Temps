@@ -20,6 +20,9 @@ void  multiplyer(std::vector< std::vector<double> >lhs,
 				std::vector< std::vector<double>> rhs,
 				std::vector< std::vector<double>> &result);
 
+void  multiplyVectByMat(std::vector< std::vector<double> >lhs, 
+				std::vector<double> rhs,
+				std::vector< std::vector<double>> &result);
 
 /*
  * Returns the largest column's row, for example if we know that row 3 has a bigger

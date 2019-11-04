@@ -62,7 +62,8 @@ vector<double> stringToVector(string str, string delim)
 
 void printMatrix(vector<vector<double> > matrix)
 {
-	for (int i = 0; i < matrix.size()* 2 +15; i++)
+	for (int i = 0; i < 15 + matrix.size() * 8 + 2; i++)
+
 		cout << "-";
 	cout << endl;
 	for (int i = 0; i < matrix.size(); i++)
@@ -76,11 +77,11 @@ void printMatrix(vector<vector<double> > matrix)
 				cout << "| " << setw(10) << matrix[i][j] << "|";
 				continue;
 			}
-			cout << setprecision(8) << matrix[i][j] << " "; 
+			cout << setw(8) <<  setprecision(8) << matrix[i][j] << " "; 
 		}
 		cout << endl;
 	}
-	for (int i = 0; i < matrix.size()*2 +15; i++)
+	for (int i = 0; i < matrix.size()*8 +15 + 2; i++)
 		cout << "-";
 	cout << endl;
 }
