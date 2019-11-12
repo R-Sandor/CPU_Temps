@@ -4,9 +4,11 @@
 #include <vector>
 using namespace std;
 
-
-typedef vector< vector<double> > liIndexVect;
+// li 0...N
+typedef  vector<vector<double> >  liIndexVect;
+// contains all of LiIndexs 0..N
 typedef vector<liIndexVect> liMatrix;
+
 
 /*
  *	Sets up all Li indexs
@@ -29,7 +31,7 @@ void createLi(liMatrix &mathVect, vector<double> &timeVect);
 *
 *
 */
-void solveLi(liMatrix mathVect, double x);
+double solveLi(liMatrix &mathVect,vector< vector<double >> data, int yCol , double x);
 
 
 

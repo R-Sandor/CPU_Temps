@@ -324,8 +324,10 @@ int main(int argc, char **argv )
 			{
 				xTx_xTyMatrix[addYIndx].push_back(xTyMatrix[addYIndx][0]);
 			}
-			
-			// Solve
+	
+
+		
+			// Solve matrix
 			for (int i = 0; i < xTx_xTyMatrix.size()-1; i++)
 			{
 				int lrgstRow = findLargestCol(xTx_xTyMatrix, i);
@@ -345,9 +347,18 @@ int main(int argc, char **argv )
 				xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-1] 
 						= xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-1] * scalar;
 				backSolve(xTx_xTyMatrix);
-				
+			
+
+
+				// Finally we have phi
 				double c0 = xTx_xTyMatrix[0][2];
 				double c1 = xTx_xTyMatrix[1][2];
+				
+
+				liMatrix mathVect;
+				createLi(mathVect, data[0]);
+				double result = solveLi(mathVect, data, outIndex, 0); 
+
 				// TODO: Break this into it's own function
 				// -------------------------------------------------------------------
 				// Write all of the points to 
@@ -356,6 +367,11 @@ int main(int argc, char **argv )
 					outputFile << "0 <= " <<  write_index * 30 <<  "< " << count*30 <<  "; " << "y" << write_index << "= " 
 							<< c0 + c1*30*write_index << "; Least Squares";
 					outputFile << endl;
+					
+					outputFile << "0 <= " <<  write_index * 30 <<  "< " << count*30 <<  "; " << "y" << write_index << "= " 
+							<< solveLi(mathVect, data, outIndex, write_index*30) << "; lagrange interpolation";
+					outputFile << endl;
+
 				}
 				outputFile.close();
 
