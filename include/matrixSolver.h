@@ -1,6 +1,8 @@
 #ifndef MATRIX_SOLVER_H
 #define MATRIX_SOLVER_H
 #include <vector>
+#include <boost/multiprecision/cpp_dec_float.hpp>
+using boost::multiprecision::cpp_dec_float_50;
 
 
 /*
@@ -38,7 +40,7 @@ void swapRow(std::vector<std::vector<double> > &matrix, int col);
 /*
  * scales the matrix by the largest column in the row. 
  */
-void scale(std::vector<std::vector<double> > &matrix, int loopIter, double scalar);
+void scale(std::vector<std::vector<double> > &matrix, int loopIter, cpp_dec_float_50 scalar);
 
 
 /*

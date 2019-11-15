@@ -16,8 +16,8 @@
 #include "matrixSolver.h"
 #include "helper.h"
 #include "interpolation.h"
-
 using namespace std;
+using boost::multiprecision::cpp_dec_float_50;
 
 
 /**
@@ -289,6 +289,13 @@ int main(int argc, char **argv )
 
 		// create the x matrix from the time column in the data vector.
 		xMatrix = createXMatrix(data[0]);
+		
+		liMatrix mathVect;
+		createLi(mathVect, data[0]);
+		vector<cpp_dec_float_50> divisors;
+		vector<cpp_dec_float_50> quotients;
+		solveLiDivisor(mathVect, divisors);
+		solveQuotients(mathVect, quotients);
 
 		// iterates through all of the data columns to ouput to a text file.
 		for (int outIndex = 1; outIndex < cores; outIndex++)
@@ -340,42 +347,48 @@ int main(int argc, char **argv )
 				xTx_xTyMatrix[i][i] = 1;
 				eliminate(xTx_xTyMatrix, i);
 			}
-				double scalar = 0.0;
-				// Last row needs to be solved.
-				scalar = 1/xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-2];
-				xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-2] = 1;
-				xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-1] 
-						= xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-1] * scalar;
-				backSolve(xTx_xTyMatrix);
-			
+			double scalar = 0.0;
+			// Last row needs to be solved.
+			scalar = 1/xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-2];
+			xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-2] = 1;
+			xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-1] 
+					= xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-1] * scalar;
+			backSolve(xTx_xTyMatrix);
+		
 
+			// Finally we have phi hat
+			// phi-hat = c0 + c1
+			double c0 = xTx_xTyMatrix[0][2];
+			double c1 = xTx_xTyMatrix[1][2];
+					/*
+			cout << "0 <= " <<  0 * 30 <<  "< " << count*30 <<  "; " << "y" << 0 << "= " 
+	             << solveLi(mathVect, data, outIndex, 0*30, divisors, quotients) << "; lagrange interpolation";
+			cout << endl;*/
 
-				// Finally we have phi
-				double c0 = xTx_xTyMatrix[0][2];
-				double c1 = xTx_xTyMatrix[1][2];
-				
+			//cout << quotients[0]/divisors[0]*data[outIndex][0] <<endl;
+			//cout << quotients[1]/divisors[1]*data[outIndex][1] << endl;
 
-				liMatrix mathVect;
-				createLi(mathVect, data[0]);
-				double result = solveLi(mathVect, data, outIndex, 0); 
+			// TODO: Break this into it's own function
+			// -------------------------------------------------------------------
+			// Write all of the points to 
+			for (int write_index = 0; write_index < count; write_index++)
+			{
+				outputFile << "0 <= " <<  write_index * 30 <<  "< " << count*30 <<  "; " << "y" << write_index << "= " 
+						<< c0 + c1*30*write_index << "; Least Squares";
+				outputFile << endl;
 
-				// TODO: Break this into it's own function
-				// -------------------------------------------------------------------
-				// Write all of the points to 
-				for (int write_index = 0; write_index < count; write_index++)
-				{
-					outputFile << "0 <= " <<  write_index * 30 <<  "< " << count*30 <<  "; " << "y" << write_index << "= " 
-							<< c0 + c1*30*write_index << "; Least Squares";
-					outputFile << endl;
-					
-					outputFile << "0 <= " <<  write_index * 30 <<  "< " << count*30 <<  "; " << "y" << write_index << "= " 
-							<< solveLi(mathVect, data, outIndex, write_index*30) << "; lagrange interpolation";
-					outputFile << endl;
+				outputFile << "0 <= " <<  write_index * 30 <<  "< " << count*30 <<  "; " << "y" << write_index << "= " 
+						<< quotients[write_index]/divisors[write_index]*data[outIndex][write_index] << "; lagrange interpolation";
+				outputFile << endl;	
+				cout << "0 <= " <<  write_index * 30 <<  "< " << count*30 <<  "; " << "y" << write_index << "= " 
+						<< quotients[write_index]/divisors[write_index]*data[outIndex][write_index] << "; lagrange interpolation";
+				cout << endl;
 
-				}
-				outputFile.close();
+			}
+			outputFile.close();
 
+			cout << "=============================================================="<< endl;
 
-				// TODO: Call interpolation function
+			// TODO: Call interpolation function
 		}
 }

@@ -2,6 +2,7 @@
 #define HELPER_H
 #include <iostream>
 #include <vector>
+#include <math.h>
 /*
  *	This function returns the number of word/numbers inside of a string
  */
@@ -16,5 +17,7 @@ std::vector<double> stringToVector(std::string str, std::string delim);
  * Prints a given matrix out to console.
  */
 void printMatrix(std::vector<std::vector<double> > matrix);
+
+bool double_is_int(double x);
 
 #endif

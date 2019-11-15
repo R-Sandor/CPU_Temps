@@ -30,6 +30,8 @@ Provided core readings courtesy of Professor Thomas J Kennedy at ODU.
 
 # Setup/Compilation & Execution Instructions  
 - Untar package.
+- modify the makefile and supply the path to the apporiate BOOST_ROOT (currently set at the convention of /usr/local/boost_#LibNumber#_
+
 - make
 
 ### To Run

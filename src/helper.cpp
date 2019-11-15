@@ -85,3 +85,8 @@ void printMatrix(vector<vector<double> > matrix)
 		cout << "-";
 	cout << endl;
 }
+
+bool double_is_int(double x) {
+   double absolute = abs( x );
+   return absolute == floor(x);
+}

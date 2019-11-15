@@ -7,9 +7,10 @@ SRCS := $(shell find $(SRC_DIRS) -name *.cpp -or -name *.c -or -name *.s)
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 INC_DIRS = include 
-INC_FLAGS := $(addprefix -I,$(INC_DIRS))
+BOOST_ROOT ?= /usr/local/boost_1_71_0
+INC_FLAGS := $(addprefix -I,$(INC_DIRS), $(BOOST_ROOT))
 
-CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -std=c++17
+CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -O3 -std=c++17
 
 $(TARGET_EXEC): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDFLAGS)

@@ -2,10 +2,13 @@
 #define INTERPOLATION_H
 
 #include <vector>
+#include <boost/multiprecision/cpp_dec_float.hpp> // very large numbers happen 
+												  // in lagrange interpolation
 using namespace std;
+using boost::multiprecision::cpp_dec_float_50;
 
 // li 0...N
-typedef  vector<vector<double> >  liIndexVect;
+typedef  vector<vector<cpp_dec_float_50> >  liIndexVect;
 // contains all of LiIndexs 0..N
 typedef vector<liIndexVect> liMatrix;
 
@@ -31,7 +34,13 @@ void createLi(liMatrix &mathVect, vector<double> &timeVect);
 *
 *
 */
-double solveLi(liMatrix &mathVect,vector< vector<double >> data, int yCol , double x);
+void solveLiDivisor(liMatrix &mathVect, vector<cpp_dec_float_50> &solvedDivs);
+
+cpp_dec_float_50 solveLi(liMatrix &mathVect, vector< vector<double>> &data,
+				int yCol, double x, vector<cpp_dec_float_50> &divisors, vector<cpp_dec_float_50>& quotients);
+
+cpp_dec_float_50 solveQuotients(liMatrix &mathVect, vector<cpp_dec_float_50>& quotients);
+
 
 
 
