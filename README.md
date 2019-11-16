@@ -41,6 +41,8 @@ or specify your boost directory when make is ran by issuing the following comman
 
 ### To Run
 > ./CPUTemps res/sensors-2018.12.26-no-labels.txt
+
+
 The program only takes one parameter, the file path
 to matrix one wishes to solve.
 
