@@ -1,11 +1,11 @@
 /**
  * @Author:	Raphael J. Sandor
  * @Date:	10/26/2019
- * @Version: 1.0
+ * @Version: 2.0
  * 
  * Description: 
  *		This program reads in a file of CPU core tempatures and find the line of best fit
- *		using either least squares or interpolation.
+ *		using either least squares and interpolation.
  *		The program then exports the approximation for a point to a txt file. 
  */
 
@@ -43,21 +43,24 @@ void  multiplyer(vector<vector<double>> lhs, vector<vector<double>> rhs, vector<
 		{
 			for (int k = 0; k < lhsCols; k++)
 			{
-				
 				result[i][j] += lhs[i][k] * rhs[k][j];
 			}
 		}
 	}
-
 }	
 
+/**
+ * @param lhs		matrix
+ * @param rhs		vector
+ * @param result	resulting matrix
+ */
 void  multiplyVectByMat(vector<vector<double>> lhs, vector<double> rhs, vector<vector<double> >& result)
 {
 	int lhsRows = lhs.size();
 	int lhsCols = lhs[0].size();
 	int rhsRows = rhs.size();
 	int rhsCols = 1;
-   
+	
 	for (int i = 0; i < lhsRows; i++)
 	{	
 		vector<double> row (rhsCols);
@@ -71,14 +74,13 @@ void  multiplyVectByMat(vector<vector<double>> lhs, vector<double> rhs, vector<v
 			}
 		}
 	}
-
 }
 
 /**
+ *	Swaps vector indices.
  *	@param matrix		The original matrix
  *	@param lrgstCol		The row (i.e. vector) with the largest column
- *	@loopIter			The iteration of the calling loop.
- *	Swaps vector indices.
+ *	@param loopIter		The iteration of the calling loop.
  */
 void swapRow(vector<vector<double> > &matrix, int loopIter, int lrgstCol)
 {
@@ -86,7 +88,9 @@ void swapRow(vector<vector<double> > &matrix, int loopIter, int lrgstCol)
 	swap(matrix[loopIter], matrix[lrgstCol]);
 }
 
-
+/**
+ *	@param dataVect the vector that contains the temp values.
+ */
 vector<vector<double>> createXMatrix(vector<double> &dataVect)
 {
 	vector<vector<double> > xMatrix;
@@ -98,6 +102,10 @@ vector<vector<double>> createXMatrix(vector<double> &dataVect)
 	return xMatrix; 
 }
 
+
+/**
+ *	@param inMatrix		inputMatrix used output the transpose  
+ */
 vector<vector<double> > createTMatrix(vector<vector<double> > &inMatrix)
 {
 	vector<vector <double> >tMatrix (inMatrix[0].size());
@@ -119,8 +127,10 @@ vector<vector<double> > createTMatrix(vector<vector<double> > &inMatrix)
 }
 
 
-/*
+/**
  *	Finds the row which the largest column belongs.
+ *	@param matrix	input matrix
+ *	@param col		Which row has the largest col 
  */
 int findLargestCol(vector<vector<double> > &matrix, int col)
 {
@@ -141,6 +151,11 @@ int findLargestCol(vector<vector<double> > &matrix, int col)
 /**
  *	Takes a matrix, and for each row (i.e. iteration of the calling loop).
  *	Scalar used to scale the matrix.
+ *	
+ *	@param matrix	input matrix
+ *	@param loopIter	the count of time scaling has previously happened
+ *	@param scalar	the value that scales the matrix
+ *	
  */
 void scale(vector<vector<double> > &matrix, int loopIter, double scalar)
 {
@@ -151,6 +166,28 @@ void scale(vector<vector<double> > &matrix, int loopIter, double scalar)
 	}
 }
 
+/**
+ *	The result is the matrix is solved.
+ *	The swap and eliminate functions leave everything but the 
+ *	last row that needs to solved and backSolv the whole matrix.
+ *	@param xTx_xTyMatrix is the xTx_xTyMatrix
+ */
+void solveLastRow(vector<vector<double> > &xTx_xTyMatrix)
+{
+
+	double scalar = 1/xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-2];
+    xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-2] = 1;
+    xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-1]
+		= xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-1] * scalar;
+    backSolve(xTx_xTyMatrix);
+
+}
+
+/**
+ *	Eliminates a given row.
+ *	@matrix the matrix the operation will effect
+ *	@rowIt	the row the operation should occur on.
+ */
 void eliminate(vector<vector<double> > &matrix, int rowIt)
 {
 	// Start column.
@@ -198,6 +235,28 @@ void backSolve(vector<vector<double> >&matrix)
 	}
 }
 
+/*
+ *	@xTx_xTyMatrix take and xTx|xTy matrix and solves
+ */
+void solveMatrix(vector<vector<double> > &xTx_xTyMatrix)
+{
+	// Solve matrix
+	for (int i = 0; i < xTx_xTyMatrix.size()-1; i++)
+    {
+		int lrgstRow = findLargestCol(xTx_xTyMatrix, i);
+		// swap the rows.
+        swapRow(xTx_xTyMatrix, i, lrgstRow);
+
+		// scale the row.
+        scale(xTx_xTyMatrix, i, xTx_xTyMatrix[i][i]);
+        xTx_xTyMatrix[i][i] = 1;
+        eliminate(xTx_xTyMatrix, i);
+	}
+    // Last row needs to be solved.
+    solveLastRow(xTx_xTyMatrix);
+}
+
+
 /**
  *	@param argc Argument count
  *	@param argv Takes file path
@@ -206,7 +265,8 @@ int main(int argc, char **argv )
 {
 	if (argv[1] == NULL)
 	{
-		cout << "Error: Please provide path to the data file. Refer to the README.md" << endl;
+		cout << "Error: Please provide path to the data file."
+			 <<	"Refer to the README.md" << endl;
 		return 1;
 	}
 	if (argc == 1)
@@ -226,7 +286,6 @@ int main(int argc, char **argv )
 	// Number of cores to be reading data from.
 	int cores;
 	vector< vector<double> > data;	
-
 
 	// Check if the path is correct.	
 	dataFile.open(path);
@@ -264,7 +323,8 @@ int main(int argc, char **argv )
 		while (getline(dataFile, line) )
 		{
 
-			// Now we want to take the output of each row and add it to its respective vector
+			// Now we want to take the output of each row and add
+			// it to its respective vector
 			inputLine = stringToVector(line, delim);
 			for (int indexOfCore = 0; indexOfCore < cores ; indexOfCore++)
 			{
@@ -278,8 +338,6 @@ int main(int argc, char **argv )
 					data[indexOfCore].push_back(inputLine[indexOfCore-1]);
 			}
 		}
-		
-		
 
 		// xMatrix
 		vector<vector<double> > xMatrix;
@@ -290,12 +348,18 @@ int main(int argc, char **argv )
 		// create the x matrix from the time column in the data vector.
 		xMatrix = createXMatrix(data[0]);
 		
+		///////////////////////////////////
+		/*
+		 *	Interpolation work.
+		 */	
 		liMatrix mathVect;
 		createLi(mathVect, data[0]);
 		vector<cpp_dec_float_50> divisors;
 		vector<cpp_dec_float_50> quotients;
 		solveLiDivisor(mathVect, divisors);
 		solveQuotients(mathVect, quotients);
+		///////////////////////////////////
+
 
 		// iterates through all of the data columns to ouput to a text file.
 		for (int outIndex = 1; outIndex < cores; outIndex++)
@@ -307,7 +371,10 @@ int main(int argc, char **argv )
 			baseName = baseName + "-core-"+to_string(outIndex-1)+".txt";
 			outputFile.open(baseName);
 			
-		
+			//////////////////////////////////////////////////////
+			/*
+			 *	Least Squares work.
+			 */	
 			xTMatrix = createTMatrix(xMatrix);
 	
 			// x Transpose x and x Transpose y matrix	
@@ -322,73 +389,21 @@ int main(int argc, char **argv )
 			multiplyer(xTMatrix, xMatrix, xTx_xTyMatrix);
 			// c Vector
 			multiplyVectByMat(xTMatrix, yMatrix, xTyMatrix);
-
-
-
-
 			// Add the c vector to the A matrix
 			for (int addYIndx = 0; addYIndx < xTx_xTyMatrix.size(); addYIndx++)
 			{
 				xTx_xTyMatrix[addYIndx].push_back(xTyMatrix[addYIndx][0]);
 			}
-	
-
 		
-			// Solve matrix
-			for (int i = 0; i < xTx_xTyMatrix.size()-1; i++)
-			{
-				int lrgstRow = findLargestCol(xTx_xTyMatrix, i);
-
-				// swap the rows.
-				swapRow(xTx_xTyMatrix, i, lrgstRow);
-
-				// scale the row.
-				scale(xTx_xTyMatrix, i, xTx_xTyMatrix[i][i]);
-				xTx_xTyMatrix[i][i] = 1;
-				eliminate(xTx_xTyMatrix, i);
-			}
-			double scalar = 0.0;
-			// Last row needs to be solved.
-			scalar = 1/xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-2];
-			xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-2] = 1;
-			xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-1] 
-					= xTx_xTyMatrix[xTx_xTyMatrix.size()-1][xTx_xTyMatrix[0].size()-1] * scalar;
-			backSolve(xTx_xTyMatrix);
-		
-
 			// Finally we have phi hat
 			// phi-hat = c0 + c1
 			double c0 = xTx_xTyMatrix[0][2];
 			double c1 = xTx_xTyMatrix[1][2];
-					/*
-			cout << "0 <= " <<  0 * 30 <<  "< " << count*30 <<  "; " << "y" << 0 << "= " 
-	             << solveLi(mathVect, data, outIndex, 0*30, divisors, quotients) << "; lagrange interpolation";
-			cout << endl;*/
 
-			//cout << quotients[0]/divisors[0]*data[outIndex][0] <<endl;
-			//cout << quotients[1]/divisors[1]*data[outIndex][1] << endl;
+			////////////////////////////////////////////////////
 
-			// TODO: Break this into it's own function
-			// -------------------------------------------------------------------
-			// Write all of the points to 
-			for (int write_index = 0; write_index < count; write_index++)
-			{
-				outputFile << "0 <= " <<  write_index * 30 <<  "< " << count*30 <<  "; " << "y" << write_index << "= " 
-						<< c0 + c1*30*write_index << "; Least Squares";
-				outputFile << endl;
+			printFile(c0, c1, quotients, divisors, data, 
+							outputFile, outIndex, count);	
 
-				outputFile << "0 <= " <<  write_index * 30 <<  "< " << count*30 <<  "; " << "y" << write_index << "= " 
-						<< quotients[write_index]/divisors[write_index]*data[outIndex][write_index] << "; lagrange interpolation";
-				outputFile << endl;	
-				cout << "0 <= " <<  write_index * 30 <<  "< " << count*30 <<  "; " << "y" << write_index << "= " 
-						<< quotients[write_index]/divisors[write_index]*data[outIndex][write_index] << "; lagrange interpolation";
-				cout << endl;
-
-			}
-			outputFile.close();
-
-			cout << "=============================================================="<< endl;
-
-			// TODO: Call interpolation function
 		}
 }

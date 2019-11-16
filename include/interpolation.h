@@ -36,12 +36,45 @@ void createLi(liMatrix &mathVect, vector<double> &timeVect);
 */
 void solveLiDivisor(liMatrix &mathVect, vector<cpp_dec_float_50> &solvedDivs);
 
-cpp_dec_float_50 solveLi(liMatrix &mathVect, vector< vector<double>> &data,
-				int yCol, double x, vector<cpp_dec_float_50> &divisors, vector<cpp_dec_float_50>& quotients);
 
-cpp_dec_float_50 solveQuotients(liMatrix &mathVect, vector<cpp_dec_float_50>& quotients);
+/*
+ * I have solved out the Lagrange interpolation in away that took advantage of what
+ * I know about interpolation. There will only ever be one value that is significant 
+ * when all of the various lis have been totaled. I know that each of my functions relate
+ * to a single time as well. So as the loop increase for each point I solve lagrange interpolation 
+ * for that point. 
+ * @param mathVect the vector that contains all of elements of Li
+ * e.g. mathVect[0][#][#] - is the first li (l0)
+ *      mathVect[0][0][#] - is l0s quotients vector
+ *      mathVect[0][1][#] - is the precomputed divisors of l0
+ *      mathVect[0][0][0] - is the first quotient of N-1 quotients 
+ *  
+ * @param quotients is an empty vector that is passed in to be solved.
+ *
+ */
+void solveQuotients(liMatrix &mathVect, vector<cpp_dec_float_50>& quotients);
 
 
-
+/**
+ *	prints to file the least squares of a given point
+ *	prints to file the interpolation of a point.
+ *
+ *	@param c0			the constant c0 value of least squares
+ *	@param c1			the xC1 value of least squares as a part of phi hat
+ *	@param quotients	each quotient as a result of Lagrange interpolation
+ *	@param divisors		each divisor as a result of lagrange interpolation
+ *	@param data			the y data points
+ *	@param outputFile	the output file
+ *	@param datCol		the core that is being approximated
+ *	@param numOfWrite	the number lines output
+ */
+void printFile(double c0, 
+                double c1, 
+                vector<cpp_dec_float_50> &quotients,
+                vector<cpp_dec_float_50> &divisors, 
+                vector< vector<double> > &data, 
+                ofstream &outputFile, 
+                int dataCol,
+                int numOfWrites);
 
 #endif

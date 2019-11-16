@@ -8,7 +8,11 @@
 #include <iomanip> //setprecision
 #include "helper.h"
 
-
+/**
+ * Counts the number of items in a string
+ * @param str	a given string
+ * @param delim the given delimiter
+ */
 using namespace std;
 int itemCount(string str, string delim)
 {
@@ -28,12 +32,14 @@ int itemCount(string str, string delim)
 
 }
 
-/*
+/**
  * Converts a string of numbers to a vector
  * e.g. string str ="10 11 12", would become
  * a vector of size 3, holding 10, 11, and 12.
+ *
+ * @param str		a given string.
+ * @param delim		delimiter
  */
-
 vector<double> stringToVector(string str, string delim)
 {
 	auto start = 0U;
@@ -59,7 +65,10 @@ vector<double> stringToVector(string str, string delim)
 
 }
 
-
+/**
+ *	outputs a matrix
+ *	@param matrix matrix to be printed.
+ */
 void printMatrix(vector<vector<double> > matrix)
 {
 	for (int i = 0; i < 15 + matrix.size() * 8 + 2; i++)
@@ -86,6 +95,10 @@ void printMatrix(vector<vector<double> > matrix)
 	cout << endl;
 }
 
+/**
+ *	tells user if double is an int
+ *	@x a given double
+ */
 bool double_is_int(double x) {
    double absolute = abs( x );
    return absolute == floor(x);
