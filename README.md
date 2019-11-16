@@ -4,9 +4,11 @@ in a CPU. Each reading was taken in 30 second internvals.
 
 The program takes the reading from the input files of each core and 
 finds the line of best fit and outputs the point of best fit for 
-each point.
+each point with least squares.
 
-Provided core readings courtesy of Professor Thomas J Kennedy at ODU. 
+The program all provides the output of interpolation at each point.
+
+Provided core readings courtesy of Professor Thomas J. Kennedy at ODU. 
 
 
 # Requirements
@@ -30,12 +32,15 @@ Provided core readings courtesy of Professor Thomas J Kennedy at ODU.
 
 # Setup/Compilation & Execution Instructions  
 - Untar package.
-- modify the makefile and supply the path to the apporiate BOOST_ROOT (currently set at the convention of /usr/local/boost_#LibNumber#_
+- modify the makefile and supply the path to the apporiate BOOST_ROOT (currently set at the convention of /usr/local/boost_#LibNumber#)	I am using boost_1_71_0.
+or specify your boost directory when make is ran by issuing the following command:
+
+ make BOOST_ROOT='/your/boost/dir'
 
 - make
 
 ### To Run
-> ./ res/matrix.txt
+> ./CpuTemps res/sensors-2018.12.26-no-labels.txt
 The program only takes one parameter, the file path
 to matrix one wishes to solve.
 
