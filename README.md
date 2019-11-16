@@ -35,9 +35,8 @@ Provided core readings courtesy of Professor Thomas J. Kennedy at ODU.
 - modify the makefile and supply the path to the apporiate BOOST_ROOT (currently set at the convention of /usr/local/boost_#LibNumber#)	I am using boost_1_71_0.
 or specify your boost directory when make is ran by issuing the following command:
 
- make BOOST_ROOT='/your/boost/dir'
+- make BOOST_ROOT='/your/boost/dir'
 
-- make
 
 ### To Run
 > ./CPUTemps res/sensors-2018.12.26-no-labels.txt
