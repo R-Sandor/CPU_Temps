@@ -36,7 +36,7 @@ Provided core readings courtesy of Professor Thomas J. Kennedy at ODU.
 or specify your boost directory when make is ran by issuing the following command:
 
 - make BOOST_ROOT='/your/boost/dir'
-
+- Otherwise just: make
 
 ### To Run
 > ./CPUTemps res/sensors-2018.12.26-no-labels.txt
