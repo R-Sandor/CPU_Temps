@@ -12,7 +12,7 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS), $(BOOST_ROOT))
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -O3 -std=c++17
 
-$(TARGET_EXEC): $(OBJS)
+$(TARGET_EXEC): $(OBJS) 
 	$(CC) $(OBJS) -o $@ $(LDFLAGS)
 	@echo ".------..------.\n|R.--. ||S.--. |\n| :(): || :/\: |\n| ()() || :\/: |\n| '--'R|| '--'S|\n\`------'\`------'"
 	@echo "github.com/R-Sandor"
@@ -24,9 +24,19 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	$(CC) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 
-.PHONY: clean
+.PHONY: clean test test_clean
+test:
+	@(cd test; make; echo "done compiling ");
+	@(cd test; ./unitTests)
 
-clean:
+run_test: 
+	@(cd test;  ./unitTests)
+
+test_clean:
+	cd test; make clean
+	
+
+clean: test_clean
 	$(RM) -r $(BUILD_DIR)
 	$(RM) -r $(TARGET_EXEC)
 	$(RM) -f res/*"-core-"*

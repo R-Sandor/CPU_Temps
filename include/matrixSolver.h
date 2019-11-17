@@ -18,8 +18,8 @@ using namespace std;
  *	@param rhs		right hand side
  *	@param result	resulting matrix
  */
-void  multiplyer(std::vector< std::vector<double> >lhs, 
-				std::vector< std::vector<double>> rhs,
+void  multiplyer(std::vector< std::vector<double> >&lhs, 
+				std::vector< std::vector<double>> &rhs,
 				std::vector< std::vector<double>> &result);
 
 /*
@@ -27,8 +27,8 @@ void  multiplyer(std::vector< std::vector<double> >lhs,
  * @param rhs       vector
  * @param result    resulting matrix
 */
-void  multiplyVectByMat(std::vector< std::vector<double> >lhs, 
-				std::vector<double> rhs,
+void  multiplyVectByMat(std::vector< std::vector<double> >&lhs, 
+				std::vector<double> &rhs,
 				std::vector< std::vector<double>> &result);
 
 /*
