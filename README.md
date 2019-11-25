@@ -35,9 +35,13 @@ Provided core readings courtesy of Professor Thomas J. Kennedy at ODU.
 
 # Setup/Compilation & Execution Instructions  
 - Untar package.
-- modify the makefiles under the project directory and the test directory and supply the path to the apporiate
-BOOST_ROOT (currently set at the convention of /usr/local/boost_#LibNumber#)	I am using boost_1_71_0.
-or specify your boost directory when make is ran by issuing the following command:
+- modify the makefiles under the project directory and the test directory and 
+supply the path to the apporiate BOOST_ROOT 
+(currently set at the convention of /usr/local/boost_#LibNumber#)
+I am using boost_1_71_0. 
+
+You may specify your boost directory when GNUmake 
+is ran by issuing the following command:
 
 - make BOOST_ROOT='/your/boost/dir'
 - make test BOOST_ROOT='/your/boost/dir
@@ -62,9 +66,10 @@ The program only takes one parameter, the file path
 to matrix one wishes to solve.
 
 
-# Acknowledgements
-I would like to give special thanks to my colleague at Alion Science and Technology for recommending the
-use of Catch2 unit testing for C++ when we were disscussing unit testing options for C++.
+### Acknowledgements
+I would like to give special thanks to my colleague at Alion Science and Technology,
+Jason Lafoutain for recommending the use of Catch2 unit testing for C++ when we were 
+disscussing unit testing options for C++.
 
 
 # Author 
