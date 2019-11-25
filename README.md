@@ -13,7 +13,10 @@ Provided core readings courtesy of Professor Thomas J. Kennedy at ODU.
 
 # Requirements
 > gcc
-> gnu make
+
+> GNUmake
+
+
 > Boost 1.71.0 (https://www.boost.org/users/download/)
 
 # Project Layout
