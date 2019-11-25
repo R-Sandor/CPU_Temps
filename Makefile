@@ -12,7 +12,7 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS), $(BOOST_ROOT))
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -O3 -std=c++17
 
-$(TARGET_EXEC): $(OBJS) 
+$(TARGET_EXEC): $(OBJS) test
 	$(CC) $(OBJS) -o $@ $(LDFLAGS)
 	@echo ".------..------.\n|R.--. ||S.--. |\n| :(): || :/\: |\n| ()() || :\/: |\n| '--'R|| '--'S|\n\`------'\`------'"
 	@echo "github.com/R-Sandor"
@@ -25,8 +25,9 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 
 
 .PHONY: clean test test_clean
-test:
-	@(cd test; make; echo "done compiling ");
+
+test:  
+	@(cd test; make "BOOST_ROOT=$(BOOST_ROOT)"; echo "Done compiling");
 	@(cd test; ./unitTests)
 
 run_test: 

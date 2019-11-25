@@ -1,11 +1,10 @@
 MAINPROG=unitTests
-
-BOOST_DIR?=/usr/local/boost_1_71_0
 SOURCES:=$(wildcard *.cpp)  
 OBJECTS=$(SOURCES:.cpp=.o) 
+BOOST_ROOT ?= 
 INC_DIR = ../include 
 BINS = $(-L../build)
-FLAGS=-std=c++17 $(addprefix -I,$(INC_DIR),  $(BOOST_DIR))
+FLAGS=-std=c++17 $(addprefix -I,$(INC_DIR), $(BOOST_ROOT))
 
 all: $(SOURCES) $(MAINPROG)
 
@@ -18,3 +17,6 @@ $(MAINPROG): $(OBJECTS)
 clean:
 		$(RM) *.o $(MAINPROG)
 
+
+phony: test
+	$(MAINPROG)

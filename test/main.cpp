@@ -23,8 +23,10 @@ TEST_CASE("Matrix Multiplication", "[matrix_mult]")
 							       {3}};	   
 	vector< vector<double> > result;
 	multiplyer(lhs, rhs, result);
-	
-
-				
+	vector <vector<double> > correct {	{14},
+										{32},
+										{50}};
+	REQUIRE( correct == result);
+					
 	
 }
