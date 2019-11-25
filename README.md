@@ -44,7 +44,7 @@ You may specify your boost directory when GNUmake
 is ran by issuing the following command:
 
 - make BOOST_ROOT='/your/boost/dir'
-- make test BOOST_ROOT='/your/boost/dir
+- make test BOOST_ROOT='/your/boost/dir'
 
 ## Build Directives:
 
