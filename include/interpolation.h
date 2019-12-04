@@ -63,6 +63,7 @@ void solveQuotients(liMatrix &mathVect, vector<cpp_dec_float_50>& quotients);
  *	@param c1			the xC1 value of least squares as a part of phi hat
  *	@param quotients	each quotient as a result of Lagrange interpolation
  *	@param divisors		each divisor as a result of lagrange interpolation
+ *	@param linearData	the linear interpolation points
  *	@param data			the y data points
  *	@param outputFile	the output file
  *	@param datCol		the core that is being approximated
@@ -73,8 +74,16 @@ void printFile(double c0,
                 vector<cpp_dec_float_50> &quotients,
                 vector<cpp_dec_float_50> &divisors, 
                 vector< vector<double> > &data, 
+				vector<double> &linearData,
                 ofstream &outputFile, 
                 int dataCol,
                 int numOfWrites);
+
+/**  
+ * @param xData         the X points
+ * @param yData         the Y points
+ * @param x             the input point.
+ */   
+double interpolate(vector<double> &xData, vector<double> &yData, double x);
 
 #endif

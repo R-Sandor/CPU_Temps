@@ -199,9 +199,9 @@ void eliminate(vector<vector<double> > &matrix, int rowIt)
  *
  * At this point the matrix has been established into the well known
  * diagnol matrix.
- * 1 # # | # \n
- * 0 1 # | # \n
- * 0 0 1 | # \n
+ * 1 # # | # 
+ * 0 1 # | # 
+ * 0 0 1 | # 
  * 
  * and the remaining #'s in the A matrix need to be 
  * replaced with 0 and the c vector need to reflect the appropriate

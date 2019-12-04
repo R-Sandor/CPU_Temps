@@ -109,20 +109,13 @@ int main(int argc, char **argv )
 
         // create the x matrix from the time column in the data vector.
         xMatrix = createXMatrix(data[0]);
-
-        ///////////////////////////////////
-        /*
-         *  Interpolation work.
-         */
-        liMatrix mathVect;
-        createLi(mathVect, data[0]);
-        vector<cpp_dec_float_50> divisors;
-        vector<cpp_dec_float_50> quotients;
-        solveLiDivisor(mathVect, divisors);
-        solveQuotients(mathVect, quotients);
-        ///////////////////////////////////
+        xTMatrix = createTMatrix(xMatrix);
 
 
+
+		// Linear interpolation data
+
+        
         // iterates through all of the data columns to ouput to a text file.
         for (int outIndex = 1; outIndex < cores; outIndex++)
         {
@@ -133,12 +126,35 @@ int main(int argc, char **argv )
             string baseName = path.substr(0, pos);
             baseName = baseName + "-core-"+to_string(outIndex-1)+".txt";
             outputFile.open(baseName);
+			
+			///////////////////////////////////
+			/*
+			*  Interpolation work.
+			*/
+			
+				// Lagrange
+				liMatrix mathVect;
+				createLi(mathVect, data[0]);
+				vector<cpp_dec_float_50> divisors;
+		        vector<cpp_dec_float_50> quotients;
+				solveLiDivisor(mathVect, divisors);
+		        solveQuotients(mathVect, quotients);
+
+				// Linear interpolation
+				vector<double> linearData;	// the result of the linear interpolation.
+				for (int xx = 0; xx < data[0].size(); xx++)
+				{
+					double linearY = interpolate(data[0], data[outIndex], data[0][xx]);
+					linearData.push_back(linearY);
+				}
+			///////////////////////////////////
+
+
 
             //////////////////////////////////////////////////////
             /*
              *  Least Squares work.
              */
-            xTMatrix = createTMatrix(xMatrix);
 
             // x Transpose x and x Transpose y matrix   
             vector<vector<double> > xTx_xTyMatrix;
@@ -152,21 +168,24 @@ int main(int argc, char **argv )
             multiplyer(xTMatrix, xMatrix, xTx_xTyMatrix);
             // c Vector
             multiplyVectByMat(xTMatrix, yMatrix, xTyMatrix);
+			
             // Add the c vector to the A matrix
             for (int addYIndx = 0; addYIndx < xTx_xTyMatrix.size(); addYIndx++)
             {
                 xTx_xTyMatrix[addYIndx].push_back(xTyMatrix[addYIndx][0]);
             }
 
+			solveMatrix(xTx_xTyMatrix);
+
             // Finally we have phi hat
             // phi-hat = c0 + c1
             double c0 = xTx_xTyMatrix[0][2];
             double c1 = xTx_xTyMatrix[1][2];
-
             ////////////////////////////////////////////////////
 
             printFile(c0, c1, quotients, divisors, data,
-                            outputFile, outIndex, count);
+                            linearData, outputFile, outIndex, 
+							count);
 
         }
 }

@@ -131,23 +131,24 @@ void solveQuotients(liMatrix &mathVect, vector<cpp_dec_float_50>& quotients)
 
 /**
  *
- * @param c0	constant value in phi hat  
- * @param c1	xc1 value.
- * @quotients	the significant value li
- * @divisors	the multiplied out divisors
- * @data		the original y value points
- * @outFile		ofstream to output data
- * @dataCol		the core that the data is related to
- * @numWrite	the count of data lines read.
+ * @param c0			constant value in phi hat  
+ * @param c1			xc1 value.
+ * @param quotients		the significant value li
+ * @param divisors		the multiplied out divisors
+ * @param data			the original y value points
+ * @param outFile		ofstream to output data
+ * @param dataCol		the core that the data is related to
+ * @param numWrite		the count of data lines read.
  */
-void printFile(double c0, 
-				double c1, 
+void printFile( double					 c0, 
+				double					 c1, 
 				vector<cpp_dec_float_50> &quotients, 
 				vector<cpp_dec_float_50> &divisors, 
 				vector< vector<double> > &data, 
-				ofstream &outputFile, 
-				int dataCol,
-				int numOfWrites)
+				vector<double>			 &linearData,
+				ofstream				 &outputFile, 
+				int						 dataCol,
+				int						 numOfWrites)
 {
 	for (int write_index = 0; write_index < numOfWrites; write_index++)
 	{
@@ -158,8 +159,44 @@ void printFile(double c0,
         outputFile << "0 <= " <<  write_index * 30 <<  "< " << numOfWrites*30 <<  "; " << "y" << write_index << "= "
                    << quotients[write_index]/divisors[write_index]*data[dataCol][write_index] << "; lagrange interpolation";
         outputFile << endl;
+		
+		outputFile << "0 <= " <<  write_index * 30 <<  "< " << numOfWrites*30 <<  "; " << "y" << write_index << "= "
+                   << linearData[write_index] << "; linear piecewise interpolation";
+        outputFile << endl;
+
+
     }
     outputFile.close();
 }
 
+/**
+ * @param xData			the X points
+ * @param yData			the Y points
+ * @param x				the input point
+ */
+double interpolate(vector<double> &xData, vector<double> &yData, double x)
+{
+	 int size = xData.size();
+	 int i = 0;					// find left end of interval for interpolation
+   if ( x >= xData[size - 2] ) //special case: beyond right end
+   {
+      i = size - 2;
+   }
+   else
+   {
+      while ( x > xData[i+1] ) i++;
+   } // points on either side (unless beyond ends)
+
+   double x_k = xData[i];
+   double y_k = yData[i];
+   double x_k_plus_1 = xData[i+1];
+   double y_k_plus_1 = yData[i+1];        
+   
+
+   double d_k = ( y_k_plus_1 - y_k ) / ( x_k_plus_1 - x_k );                                    // gradient
+
+   return y_k + d_k * ( x - x_k );  
+
+
+}
 
